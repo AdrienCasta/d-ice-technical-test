@@ -1,12 +1,37 @@
 import { Route, Waypoint } from '@domain/entities';
+import { InsufficientWaypointsError, InvalidWaypointError } from './Route';
 
 describe('Route', () => {
-  it('knows what is route', () => {
-    const route = new Route('Route 1', [
-      new Waypoint(1, 1),
-      new Waypoint(2, 2),
+  const leHavreWaypoint = Waypoint.create(49.4937, 0.1077);
+  const dieppeWaypoint = Waypoint.create(50.3793, 1.6296);
+  const invalidLatitudeWaypoint = Waypoint.create(91, 0);
+
+  it('creates a valid route with two waypoints', () => {
+    const leHavreDieppeRoute = Route.create('Le Havre - Dieppe', [
+      leHavreWaypoint,
+      dieppeWaypoint,
     ]);
 
-    expect(route.name).toBe('Route 1');
+    expect(leHavreDieppeRoute.isSuccess()).toBe(true);
+    expect(leHavreDieppeRoute.value?.name).toBe('Le Havre - Dieppe');
+  });
+
+  it('fails to create a route with insufficient waypoints', () => {
+    const insufficientWaypointsRoute = Route.create('Le Havre - Dieppe', [
+      leHavreWaypoint,
+    ]);
+    expect(insufficientWaypointsRoute.isSuccess()).toBe(false);
+    expect(insufficientWaypointsRoute.error).toBeInstanceOf(
+      InsufficientWaypointsError
+    );
+  });
+
+  it('fails to create a route with invalid waypoints', () => {
+    const invalidWaypointRoute = Route.create('Le Havre - Invalid', [
+      leHavreWaypoint,
+      invalidLatitudeWaypoint,
+    ]);
+    expect(invalidWaypointRoute.isSuccess()).toBe(false);
+    expect(invalidWaypointRoute.error).toBeInstanceOf(InvalidWaypointError);
   });
 });
