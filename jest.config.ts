@@ -1,4 +1,4 @@
-const { pathsToModuleNameMapper } = require('ts-jest');
+import { pathsToModuleNameMapper } from 'ts-jest';
 
 const paths = {
   '@domain/*': ['src/domain/*'],
@@ -6,7 +6,7 @@ const paths = {
   '@infra/*': ['src/infra/*'],
 };
 
-module.exports = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
