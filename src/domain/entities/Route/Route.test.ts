@@ -43,9 +43,38 @@ describe('Route', () => {
 
     const fosSurMerWaypoint = Waypoint.create(49.9923, 1.8562);
 
-    const updatedRoute = leHavreDieppeRoute.addWaypoint(fosSurMerWaypoint);
+    const updatedRoute = leHavreDieppeRoute.update(
+      Route.create('Le Havre - Dieppe - Fos sur Mer', [
+        leHavreWaypoint,
+        dieppeWaypoint,
+        fosSurMerWaypoint,
+      ])
+    );
 
     expect(updatedRoute.isSuccess()).toBe(true);
     expect(updatedRoute.value?.waypoints).toHaveLength(3);
+  });
+
+  it('can update a waypoints of a route', () => {
+    const leHavreDieppeRoute = Route.create('Le Havre - Dieppe', [
+      leHavreWaypoint,
+      dieppeWaypoint,
+    ]).value as Route;
+
+    const fosSurMerWaypoint = Waypoint.create(49.9923, 1.8562);
+
+    const updatedRoute = leHavreDieppeRoute.update(
+      Route.create('Le Havre - Dieppe - Fos sur Mer', [
+        leHavreWaypoint,
+        fosSurMerWaypoint,
+      ])
+    );
+
+    expect(updatedRoute.isSuccess()).toBe(true);
+    expect(updatedRoute.value?.waypoints).toHaveLength(2);
+    expect(updatedRoute.value?.waypoints).toEqual([
+      leHavreWaypoint.value as Waypoint,
+      fosSurMerWaypoint.value as Waypoint,
+    ]);
   });
 });

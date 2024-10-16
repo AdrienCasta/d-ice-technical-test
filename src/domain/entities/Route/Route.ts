@@ -33,15 +33,15 @@ export default class Route {
     );
   }
 
-  addWaypoint(waypointOrError: Maybe<Waypoint>): Maybe<Route> {
-    if (waypointOrError.isFailure()) {
-      return Result.failure(waypointOrError.error);
+  update(route: Maybe<Route>): Maybe<Route> {
+    if (route.isFailure()) {
+      return Result.failure(route.error);
     }
 
-    const waypoint = waypointOrError.value as Waypoint;
+    const updatedRoute = route.value as Route;
 
     return Result.success(
-      new Route(this.id, this.name, [...this.waypoints, waypoint])
+      new Route(this.id, updatedRoute.name, updatedRoute.waypoints)
     );
   }
 }
