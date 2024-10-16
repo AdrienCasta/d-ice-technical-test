@@ -1,4 +1,4 @@
-import { Route, Waypoint } from '../';
+import { Route, Waypoint } from '..';
 import { InsufficientWaypointsError, InvalidWaypointError } from './Route';
 
 describe('Route', () => {

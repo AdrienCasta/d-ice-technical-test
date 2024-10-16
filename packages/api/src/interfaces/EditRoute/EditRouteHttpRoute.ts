@@ -14,6 +14,7 @@ export default function editRouteHttpRoute(
 
       return reply.status(201).send();
     } catch (error) {
+      console.error(error);
       return reply.status(500).send({ message: 'Erreur' });
     }
   });

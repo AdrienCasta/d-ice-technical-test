@@ -11,6 +11,7 @@ export default function getRoutesHttpRoute(
 
       return reply.status(200).send(routes);
     } catch (error) {
+      console.error(error);
       return reply.status(500).send({ message: 'Erreur' });
     }
   });
