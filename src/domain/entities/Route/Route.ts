@@ -1,8 +1,8 @@
-import type { Waypoint } from '@domain/entities';
 import { randomUUID } from 'crypto';
 import Result from '../../../shared/Result';
-import Maybe from 'src/shared/Maybe';
 
+import { Waypoint } from '..';
+import Maybe from '../../../shared/Maybe';
 export default class Route {
   private constructor(
     public readonly id: string,

@@ -1,34 +1,19 @@
 {
   "compilerOptions": {
-    /* Base Options: */
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "es2022",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": {
-      "@domain/*": ["src/domain/*"],
-      "@application/*": ["src/application/*"],
-      "@infra/*": ["src/infra/*"]
-    },
-    /* Strictness */
-    "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "declaration": true,
-
-    /* AND if you're building for a library in a monorepo: */
-    "composite": true,
-    "declarationMap": true,
-
-    /* If NOT transpiling with TypeScript: */
-    "module": "preserve",
-    "noEmit": true,
-
-    /* If your code doesn't run in the DOM: */
+    "target": "ES2020",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "lib": ["es2022"]
-  }
+  },
+  "exclude": ["jest.config.ts"]
 }

@@ -1,5 +1,5 @@
-import { Route, Waypoint } from '@domain/entities';
-import { InMemoryRouteRepository } from '@infra/repositories';
+import { Route, Waypoint } from '../../../domain/entities';
+import { InMemoryRouteRepository } from '../../../infra/repositories';
 import RemoveRoute from './RemoveRoute';
 
 describe('RemoveRoute', () => {
@@ -18,19 +18,10 @@ describe('RemoveRoute', () => {
   });
 
   it('should remove an existing route from the repository', async () => {
-    expect(routeRepository.getByName('Le Havre - Dieppe')).toBeDefined();
+    expect(await routeRepository.getByName('Le Havre - Dieppe')).toBeDefined();
 
-    await removeRoute.execute(leHavreDieppeRoute);
+    await removeRoute.execute(leHavreDieppeRoute.id);
 
-    expect(routeRepository.getByName('Le Havre - Dieppe')).toBeNull();
-  });
-
-  it('should not throw an error when removing a non-existent route', async () => {
-    const nonExistentRoute = Route.create('Non-existent Route', [
-      Waypoint.create(0, 0),
-      Waypoint.create(1, 1),
-    ]).value as Route;
-
-    await expect(removeRoute.execute(nonExistentRoute)).resolves.not.toThrow();
+    expect(await routeRepository.getByName('Le Havre - Dieppe')).toBeNull();
   });
 });

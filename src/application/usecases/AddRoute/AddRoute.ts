@@ -1,5 +1,5 @@
-import { Route } from '@domain/entities';
-import type { RouteRepository } from '@domain/repositories';
+import { Route } from '../../../domain/entities';
+import { RouteRepository } from '../../../domain/repositories';
 import Result from '../../../shared/Result';
 
 export default class AddRoute {

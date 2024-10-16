@@ -1,26 +1,30 @@
-import { Route } from '@domain/entities';
-import type { RouteRepository } from '@domain/repositories';
+import { Route } from '../../domain/entities';
+import RouteRepository from '../../domain/repositories/RouteRepository';
 
 export default class InMemoryRouteRepository implements RouteRepository {
   private routes: Route[] = [];
 
-  add(route: Route): void {
+  async add(route: Route): Promise<void> {
     this.routes.push(route);
   }
 
-  getById(id: string): Route | null {
+  async getById(id: string): Promise<Route | null> {
     return this.routes.find((route) => route.id === id) ?? null;
   }
 
-  update(route: Route): void {
+  async getAll(): Promise<Route[]> {
+    return this.routes;
+  }
+
+  async update(route: Route): Promise<void> {
     this.routes = this.routes.map((r) => (r.id === route.id ? route : r));
   }
 
-  remove(route: Route): void {
-    this.routes = this.routes.filter((r) => r.name !== route.name);
+  async remove(routeId: string): Promise<void> {
+    this.routes = this.routes.filter((r) => r.id !== routeId);
   }
 
-  getByName(name: string): Route | null {
+  async getByName(name: string): Promise<Route | null> {
     return this.routes.find((route) => route.name === name) ?? null;
   }
 }

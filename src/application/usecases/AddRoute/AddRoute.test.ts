@@ -1,7 +1,8 @@
-import { Route, Waypoint } from '@domain/entities';
 import AddRoute from './AddRoute';
-import { InMemoryRouteRepository } from '@infra/repositories';
-import Result from 'src/shared/Result';
+import { Route } from '../../../domain/entities';
+import { Waypoint } from '../../../domain/entities';
+import Result from '../../../shared/Result';
+import { InMemoryRouteRepository } from '../../../infra/repositories';
 
 describe('adding a route', () => {
   const brestWaypoint = Waypoint.create(48.3906, -4.486);
@@ -25,7 +26,7 @@ describe('adding a route', () => {
     await addRoute.execute(mayBeBreastSaintNazaireRoute);
 
     expect(
-      routeRepository.getByName(
+      await routeRepository.getByName(
         (mayBeBreastSaintNazaireRoute.value as Route).name
       )
     ).toEqual(mayBeBreastSaintNazaireRoute.value);
@@ -44,8 +45,10 @@ describe('adding a route', () => {
     );
 
     expect(
-      routeRepository.getByName(
-        (mayBeBreastSaintNazaireRoute.value as Route).name
+      (
+        await routeRepository.getByName(
+          (mayBeBreastSaintNazaireRoute.value as Route).name
+        )
       )?.id
     ).toEqual((mayBeBreastSaintNazaireRoute.value as Route).id);
   });

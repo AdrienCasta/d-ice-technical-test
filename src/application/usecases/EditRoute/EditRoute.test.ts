@@ -1,7 +1,7 @@
-import { Route, Waypoint } from '@domain/entities';
-import { InMemoryRouteRepository } from '@infra/repositories';
+import { Route, Waypoint } from '../../../domain/entities';
+import { InMemoryRouteRepository } from '../../../infra/repositories';
+import Maybe from '../../../shared/Maybe';
 import EditRoute from './EditRoute';
-import Maybe from 'src/shared/Maybe';
 
 describe('EditRoute', () => {
   let routeRepository: InMemoryRouteRepository;
@@ -28,52 +28,45 @@ describe('EditRoute', () => {
   it('can add a new waypoint to a route', async () => {
     const fosSurMerWaypoint = Waypoint.create(49.9923, 1.8562);
 
-    const leHavreDieppeFosSurMerRoute = leHavreDieppeRoute.update(
-      Route.create('Le Havre - Dieppe - Fos sur Mer', [
-        leHavreWaypoint,
-        fosSurMerWaypoint,
-      ])
+    const leHavreDieppeFosSurMerRoute = Route.create(
+      'Le Havre - Dieppe - Fos sur Mer',
+      [leHavreWaypoint, fosSurMerWaypoint]
     );
 
-    await editRoute.execute(leHavreDieppeFosSurMerRoute);
+    await editRoute.execute(leHavreDieppeRoute.id, leHavreDieppeFosSurMerRoute);
 
-    expect(routeRepository.getById(leHavreDieppeRoute.id)).toEqual(
-      leHavreDieppeFosSurMerRoute.value
-    );
+    expect(
+      (await routeRepository.getById(leHavreDieppeRoute.id))?.waypoints
+    ).toEqual(leHavreDieppeFosSurMerRoute.value?.waypoints);
   });
 
   it('can update waypoints of a route', async () => {
     const fosSurMerWaypoint = Waypoint.create(49.9923, 1.8562);
 
-    const leHavreFosSurMerRoute = leHavreDieppeRoute.update(
-      Route.create('Le Havre - Fos sur Mer', [
-        leHavreWaypoint,
-        fosSurMerWaypoint,
-      ])
-    );
+    const leHavreFosSurMerRoute = Route.create('Le Havre - Fos sur Mer', [
+      leHavreWaypoint,
+      fosSurMerWaypoint,
+    ]);
 
-    await editRoute.execute(leHavreFosSurMerRoute);
+    await editRoute.execute(leHavreDieppeRoute.id, leHavreFosSurMerRoute);
 
-    expect(routeRepository.getById(leHavreDieppeRoute.id)?.waypoints).toEqual(
-      leHavreFosSurMerRoute.value?.waypoints
-    );
+    expect(
+      (await routeRepository.getById(leHavreDieppeRoute.id))?.waypoints
+    ).toEqual(leHavreFosSurMerRoute.value?.waypoints);
   });
 
   it('can update the name of a route', async () => {
     const fosSurMerWaypoint = Waypoint.create(49.9923, 1.8562);
 
-    const leHavreFosSurMerDieppeRoute = leHavreDieppeRoute.update(
-      Route.create('Le Havre - Dieppe - Fos sur Mer', [
-        leHavreWaypoint,
-        dieppeWaypoint,
-        fosSurMerWaypoint,
-      ])
+    const leHavreFosSurMerDieppeRoute = Route.create(
+      'Le Havre - Dieppe - Fos sur Mer',
+      [leHavreWaypoint, dieppeWaypoint, fosSurMerWaypoint]
     );
 
-    await editRoute.execute(leHavreFosSurMerDieppeRoute);
+    await editRoute.execute(leHavreDieppeRoute.id, leHavreFosSurMerDieppeRoute);
 
-    expect(routeRepository.getById(leHavreDieppeRoute.id)?.name).toEqual(
-      leHavreFosSurMerDieppeRoute.value?.name
-    );
+    expect(
+      (await routeRepository.getById(leHavreDieppeRoute.id))?.name
+    ).toEqual(leHavreFosSurMerDieppeRoute.value?.name);
   });
 });
