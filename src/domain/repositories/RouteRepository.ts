@@ -3,5 +3,7 @@ import type { Route } from '@domain/entities';
 export default interface RouteRepository {
   add(route: Route): void;
   remove(route: Route): void;
+  update(route: Route): void;
   getByName(name: string): Route | null;
+  getById(id: string): Route | null;
 }

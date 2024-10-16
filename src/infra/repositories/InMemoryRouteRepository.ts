@@ -8,6 +8,14 @@ export default class InMemoryRouteRepository implements RouteRepository {
     this.routes.push(route);
   }
 
+  getById(id: string): Route | null {
+    return this.routes.find((route) => route.id === id) ?? null;
+  }
+
+  update(route: Route): void {
+    this.routes = this.routes.map((r) => (r.id === route.id ? route : r));
+  }
+
   remove(route: Route): void {
     this.routes = this.routes.filter((r) => r.name !== route.name);
   }

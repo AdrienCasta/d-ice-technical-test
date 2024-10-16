@@ -13,11 +13,11 @@ export default class Result<T, E extends Error = Error> {
     return new Result<never, E>(false, undefined, error);
   }
 
-  isSuccess(): this is Result<T, never> {
+  isSuccess(): this is { success: true; error: undefined; value: T } {
     return this.success;
   }
 
-  isFailure(): this is Result<never, E> {
+  isFailure(): this is { success: false; error: E; value: undefined } {
     return !this.success;
   }
 }

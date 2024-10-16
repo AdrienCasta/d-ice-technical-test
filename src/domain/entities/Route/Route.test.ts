@@ -34,4 +34,18 @@ describe('Route', () => {
     expect(invalidWaypointRoute.isSuccess()).toBe(false);
     expect(invalidWaypointRoute.error).toBeInstanceOf(InvalidWaypointError);
   });
+
+  it('can add a new waypoint to a route', () => {
+    const leHavreDieppeRoute = Route.create('Le Havre - Dieppe', [
+      leHavreWaypoint,
+      dieppeWaypoint,
+    ]).value as Route;
+
+    const fosSurMerWaypoint = Waypoint.create(49.9923, 1.8562);
+
+    const updatedRoute = leHavreDieppeRoute.addWaypoint(fosSurMerWaypoint);
+
+    expect(updatedRoute.isSuccess()).toBe(true);
+    expect(updatedRoute.value?.waypoints).toHaveLength(3);
+  });
 });
