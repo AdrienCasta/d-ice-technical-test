@@ -14,17 +14,21 @@ mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_ACCESS_TOKEN;
 export default function RoutePlanner() {
   const mapContainer = useRef(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const { routes, addRoute, updateRoute, deleteRoute } = useRoutes();
+  const { routes, addRoute, updateRoute, deleteRoute, saveRoute, getRoutes } =
+    useRoutes();
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
 
   useEffect(() => {
-    if (map.current) return;
-    map.current = initializeMap(mapContainer.current!);
+    getRoutes();
+    if (!map.current) {
+      map.current = initializeMap(mapContainer.current!);
+    }
   }, []);
 
   useEffect(() => {
-    if (!map.current || !selectedRoute) return;
-    updateMapRoute(map.current, selectedRoute);
+    if (map.current && selectedRoute) {
+      updateMapRoute(map.current, selectedRoute);
+    }
   }, [selectedRoute]);
 
   const handleAddRoute = () => {
@@ -32,15 +36,23 @@ export default function RoutePlanner() {
     setSelectedRoute(newRoute);
   };
 
-  const handleDeleteRoute = () => {
-    deleteRoute((selectedRoute as Route).id);
+  const handleRouteAction = async (action: () => Promise<any>) => {
+    await action();
     setSelectedRoute(null);
+    await getRoutes();
   };
 
-  const handleUpdateRoute = (updatedRoute: Route) => {
-    updateRoute(updatedRoute);
-    setSelectedRoute(updatedRoute);
-  };
+  const handleDeleteRoute = () =>
+    handleRouteAction(() => {
+      if (!selectedRoute?.id) return Promise.resolve();
+      return deleteRoute(selectedRoute.id);
+    });
+
+  const handleUpdateRoute = (route: Route) =>
+    handleRouteAction(() => updateRoute(route));
+
+  const handleSaveRoute = (route: Route) =>
+    handleRouteAction(() => saveRoute(route));
 
   return (
     <div className="flex h-screen">
@@ -52,6 +64,7 @@ export default function RoutePlanner() {
             onBack={() => setSelectedRoute(null)}
             onUpdate={handleUpdateRoute}
             onDelete={handleDeleteRoute}
+            onSaveRoute={handleSaveRoute}
           />
         ) : (
           <RouteList
