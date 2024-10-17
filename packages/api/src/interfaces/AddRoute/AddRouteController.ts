@@ -31,22 +31,3 @@ export default class AddRouteController {
     }
   }
 }
-
-interface RouteDto {
-  id: string;
-  name: string;
-  waypoints: {
-    latitude: number;
-    longitude: number;
-  }[];
-}
-const routeToDto = (route: Route): RouteDto => {
-  return {
-    id: route.id,
-    name: route.name,
-    waypoints: route.waypoints.map((waypoint) => ({
-      latitude: waypoint.latitude,
-      longitude: waypoint.longitude,
-    })),
-  };
-};
