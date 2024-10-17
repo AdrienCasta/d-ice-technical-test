@@ -7,8 +7,10 @@ const WaypointSchema = z.object({
 
 const EditRouteBody = z.object({
   id: z.string(),
-  name: z.string(),
-  waypoints: z.array(WaypointSchema),
+  name: z.string().min(1, 'Name is required'),
+  waypoints: z
+    .array(WaypointSchema)
+    .min(2, 'At least 2 waypoints are required'),
 });
 
 export type EditRouteBody = z.infer<typeof EditRouteBody>;

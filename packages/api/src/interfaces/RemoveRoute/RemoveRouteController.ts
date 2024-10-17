@@ -1,3 +1,4 @@
+import { FastifyReply, FastifyRequest } from 'fastify';
 import RemoveRoute from '../../application/usecases/RemoveRoute/RemoveRoute';
 import {
   type RemoveRouteParams,
@@ -7,10 +8,17 @@ import {
 export default class RemoveRouteController {
   constructor(private readonly removeRoute: RemoveRoute) {}
 
-  async handle(removeRouteParams: RemoveRouteParams) {
-    if (!validateRemoveRouteParams(removeRouteParams)) {
-      throw new Error('Invalid route params');
+  async handle(request: FastifyRequest, reply: FastifyReply) {
+    const removeRouteParams = request.params as RemoveRouteParams;
+    const validation = validateRemoveRouteParams(removeRouteParams);
+    if (!validation.success) {
+      return reply.status(400).send({ message: validation.error.message });
     }
-    return this.removeRoute.execute(removeRouteParams.id);
+    try {
+      await this.removeRoute.execute(removeRouteParams.id);
+      return reply.status(204).send();
+    } catch (error) {
+      return reply.status(500).send({ message: (error as Error).message });
+    }
   }
 }

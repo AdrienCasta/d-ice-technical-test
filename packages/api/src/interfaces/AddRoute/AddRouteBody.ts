@@ -6,8 +6,8 @@ const WaypointSchema = z.object({
 });
 
 const AddRouteParamsBody = z.object({
-  name: z.string(),
-  waypoints: z.array(WaypointSchema),
+  name: z.string().min(1),
+  waypoints: z.array(WaypointSchema).min(2),
 });
 
 export type AddRouteParams = z.infer<typeof AddRouteParamsBody>;

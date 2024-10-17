@@ -9,13 +9,6 @@ export default function editRouteHttpRoute(
   fastify.put<{
     Body: EditRouteBody;
   }>('/routes', async (request, reply) => {
-    try {
-      await editRouteController.handle(request.body);
-
-      return reply.status(201).send();
-    } catch (error) {
-      console.error(error);
-      return reply.status(500).send({ message: 'Erreur' });
-    }
+    await editRouteController.handle(request, reply);
   });
 }

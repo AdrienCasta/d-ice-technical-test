@@ -1,49 +1,57 @@
-import { fastify } from 'fastify';
 import GetRoutesController from './GetRoutesController';
-import InMemoryRouteRepository from '../../infra/repositories/InMemoryRouteRepository';
-import { Route, Waypoint } from '../../domain/entities';
-import { RouteRepository } from '../../domain/repositories';
+import fastify, { FastifyInstance } from 'fastify';
 import getRoutesHttpRoute from './GetRoutesHttpRoute';
-import GetRoutes from '../../application/usecases/GetRoutes/GetRoutes';
+import { GetRoutes } from '../../application/usecases';
+import { InMemoryRouteRepository } from '../../infra/repositories';
+import { Route, Waypoint } from '../../domain/entities';
 
 describe('GetRoutesHttpRoute', () => {
-  it('should be able to get routes', async () => {
-    const routeRepository = new InMemoryRouteRepository();
-    await routeRepository.add(rotterdamFosSurMerRoute.value as Route);
-    const server = buildServer(routeRepository);
+  let server: FastifyInstance;
+  let routeRepository: InMemoryRouteRepository;
 
+  beforeEach(async () => {
+    server = fastify();
+    routeRepository = new InMemoryRouteRepository();
+
+    const getRoutesController = new GetRoutesController(
+      new GetRoutes(routeRepository)
+    );
+    getRoutesHttpRoute(server, getRoutesController);
+  });
+
+  it('should get all routes', async () => {
+    await routeRepository.add(
+      Route.create('Dieppe - Le Havre', [
+        Waypoint.create(49.9794, 1.124),
+        Waypoint.create(49.4944, 0.1079),
+      ]).value as Route
+    );
+    await routeRepository.add(
+      Route.create('Paris - Lyon', [
+        Waypoint.create(48.8566, 2.3522),
+        Waypoint.create(45.764, 4.8357),
+      ]).value as Route
+    );
     const response = await server.inject({
       method: 'GET',
       url: '/routes',
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: rotterdamFosSurMerRoute.value?.id,
-          name: rotterdamFosSurMerRoute.value?.name,
-          waypoints: rotterdamFosSurMerRoute.value?.waypoints,
-        }),
-      ])
-    );
+    const routes = JSON.parse(response.payload);
+    expect(routes).toHaveLength(2);
+    expect(routes[0].name).toBe('Dieppe - Le Havre');
+    expect(routes[1].name).toBe('Paris - Lyon');
+  });
+
+  it('should return an empty array when there are no routes', async () => {
+    const response = await server.inject({
+      method: 'GET',
+      url: '/routes',
+    });
+
+    expect(response.statusCode).toBe(200);
+    const routes = JSON.parse(response.payload);
+    expect(routes).toHaveLength(0);
   });
 });
-
-const rotterdamFosSurMerRoute = Route.create('Rotterdam 🚢 Fos sur Mer', [
-  Waypoint.create(1, 1),
-  Waypoint.create(2, 2),
-]);
-
-function buildServer(routeRepository: RouteRepository) {
-  const server = fastify();
-
-  server.register((fastify) =>
-    getRoutesHttpRoute(
-      fastify,
-      new GetRoutesController(new GetRoutes(routeRepository))
-    )
-  );
-
-  return server;
-}

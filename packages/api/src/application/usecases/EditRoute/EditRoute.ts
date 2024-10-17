@@ -8,7 +8,7 @@ export default class EditRoute {
   async execute(routeId: string, updatedRoute: Maybe<Route>): Promise<void> {
     const storedRoute = await this.routeRepository.getById(routeId);
     if (storedRoute === null) {
-      throw new Error('Route not found');
+      throw new EditRouteNotFoundError();
     }
 
     const routeToUpdate = storedRoute.update(updatedRoute);
@@ -18,5 +18,12 @@ export default class EditRoute {
     }
 
     this.routeRepository.update(routeToUpdate.value as Route);
+  }
+}
+
+export class EditRouteNotFoundError extends Error {
+  constructor() {
+    super('Route not found');
+    this.name = 'EditRouteNotFoundError';
   }
 }

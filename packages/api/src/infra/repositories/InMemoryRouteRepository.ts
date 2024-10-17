@@ -2,7 +2,7 @@ import { Route } from '../../domain/entities';
 import RouteRepository from '../../domain/repositories/RouteRepository';
 
 export default class InMemoryRouteRepository implements RouteRepository {
-  private routes: Route[] = [];
+  routes: Route[] = [];
 
   async add(route: Route): Promise<void> {
     this.routes.push(route);
