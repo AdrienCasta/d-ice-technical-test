@@ -5,6 +5,7 @@ import { Route, RouteSchema } from "../types";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import React from "react";
 
 type RouteDetailsProps = {
   route: Route;
@@ -86,54 +87,65 @@ export default function RouteDetails({
         </thead>
         <tbody>
           {fields.map((field, index) => (
-            <tr key={field.id}>
-              <td>WP{index + 1}</td>
-              <td>
-                <Controller
-                  name={`waypoints.${index}.latitude`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      min={-90}
-                      max={90}
-                      maxLength={3}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                      type="number"
-                      className="w-20 bg-slate-800 border-slate-700"
-                    />
-                  )}
-                />
-              </td>
-              <td>
-                <Controller
-                  name={`waypoints.${index}.longitude`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      type="number"
-                      min={-180}
-                      max={180}
-                      maxLength={3}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                      className="w-20 bg-slate-800 border-slate-700"
-                    />
-                  )}
-                />
-              </td>
-              <td>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeWaypoint(index)}
-                  type="button"
-                  disabled={fields.length <= 2}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </td>
-            </tr>
+            <React.Fragment key={field.id}>
+              <tr>
+                <td>WP{index + 1}</td>
+                <td>
+                  <Controller
+                    name={`waypoints.${index}.latitude`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          if (!isNaN(value) && value >= -90 && value <= 90) {
+                            field.onChange(value);
+                          }
+                        }}
+                        type="text"
+                        className="w-20 bg-slate-800 border-slate-700"
+                      />
+                    )}
+                  />
+                </td>
+                <td>
+                  <Controller
+                    name={`waypoints.${index}.longitude`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="text"
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          if (!isNaN(value) && value >= -180 && value <= 180) {
+                            field.onChange(value);
+                          }
+                        }}
+                        className="w-20 bg-slate-800 border-slate-700"
+                      />
+                    )}
+                  />
+                </td>
+                <td>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeWaypoint(index)}
+                    type="button"
+                    disabled={fields.length <= 2}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </td>
+              </tr>
+              {index < fields.length - 1 && (
+                <tr>
+                  <td colSpan={4} className="h-2"></td>
+                </tr>
+              )}
+            </React.Fragment>
           ))}
           <tr>
             <td colSpan={4}>
