@@ -18,7 +18,7 @@ export const useRoute = () => {
   const createRoute = useMutation<Route, Error, Omit<Route, "id">>({
     mutationFn: async (newRoute) => {
       const { data } = await axios.post<Route>(API_URL, newRoute);
-      return data;
+      return data.value;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["routes"] });

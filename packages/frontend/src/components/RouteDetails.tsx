@@ -22,18 +22,21 @@ export default function RouteDetails({
   onBack,
   onUpdate,
   onDelete,
-  onSaveRoute,
 }: RouteDetailsProps) {
   const {
     control,
-    handleSubmit,
     formState: { errors, isValid, isDirty },
     watch,
+    reset,
   } = useForm<RouteSchemaType>({
     defaultValues: route,
     resolver: zodResolver(RouteSchema),
     mode: "onChange",
   });
+
+  React.useEffect(() => {
+    reset(route);
+  }, [route, reset]);
 
   const { fields, remove, append } = useFieldArray({
     control,
@@ -43,17 +46,20 @@ export default function RouteDetails({
 
   const addWaypoint = () => {
     append({ latitude: 0, longitude: 0 });
+    onUpdate(watch());
   };
 
   const removeWaypoint = (index: number) => {
-    if (fields.length > 2) {
-      remove(index);
+    if (fields.length <= 2) {
+      return;
     }
+    remove(index);
+    onUpdate(watch());
   };
 
   React.useEffect(() => {
     const subscription = watch((value) => {
-      if (isValid) {
+      if (isValid && isDirty) {
         onUpdate(value as Route);
       }
     });

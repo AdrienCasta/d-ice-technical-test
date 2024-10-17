@@ -1,22 +1,36 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
+import { useEffect, useState } from "react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Route } from "./types";
-import { initializeMap, updateMapRoute } from "./mapUtils";
+import useMap from "./hooks/useMap";
 import RouteList from "./components/RouteList";
 import RouteDetails from "./components/RouteDetails";
 import { useRoute } from "./hooks/useRoute";
 
-mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_ACCESS_TOKEN;
-
 export default function RoutePlanner() {
-  const mapContainer = useRef(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
+
+  const { mapContainer, updateMapRoute } = useMap({
+    onMarkerDragEnd: (marker, waypointIndex) => {
+      if (!selectedRoute) return;
+      handleUpdateRoute({
+        ...selectedRoute,
+        waypoints: selectedRoute?.waypoints.map((waypoint, index) => {
+          if (index === waypointIndex) {
+            return {
+              ...waypoint,
+              latitude: marker.getLngLat().lat,
+              longitude: marker.getLngLat().lng,
+            };
+          }
+          return waypoint;
+        }),
+      });
+    },
+  });
 
   const { getRoutes, createRoute, updateRoute, deleteRoute } = useRoute();
-
   const { data: routes } = getRoutes;
 
   const handleUpdateRoute = (updatedRoute: Route) => {
@@ -35,26 +49,16 @@ export default function RoutePlanner() {
     });
   };
 
-  const handleCreateRoute = (newRoute: Omit<Route, "id">) => {
-    createRoute.mutate(newRoute, {
-      onSuccess: () => {
+  const handleCreateRoute = (route: Omit<Route, "id">) => {
+    createRoute.mutate(route, {
+      onSuccess: (newRoute) => {
         setSelectedRoute(newRoute);
       },
     });
   };
 
-  const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
-
   useEffect(() => {
-    if (!map.current) {
-      map.current = initializeMap(mapContainer.current!);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (map.current && selectedRoute) {
-      updateMapRoute(map.current, selectedRoute);
-    }
+    updateMapRoute(selectedRoute);
   }, [selectedRoute]);
 
   return (

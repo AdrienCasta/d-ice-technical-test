@@ -32,9 +32,8 @@ describe('AddRouteHttpRoute', () => {
     });
 
     expect(response.statusCode).toBe(201);
-    expect(routeRepository.routes).toHaveLength(1);
-    expect(routeRepository.routes[0]?.name).toBe('Dieppe - Le Havre');
-    expect(routeRepository.routes[0]?.waypoints).toHaveLength(2);
+    const responseBody = JSON.parse(response.payload);
+    expect(responseBody.value).toEqual(routeRepository.routes[0]);
   });
 
   it('should return 400 if the route does not have a name', async () => {

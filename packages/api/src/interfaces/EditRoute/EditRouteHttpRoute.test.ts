@@ -1,9 +1,9 @@
 import EditRouteController from './EditRouteController';
 import fastify, { FastifyInstance } from 'fastify';
 import editRouteHttpRoute from './EditRouteHttpRoute';
-import InMemoryRouteRepository from '../../../dist/infra/repositories/InMemoryRouteRepository';
 import { EditRoute } from '../../application/usecases';
 import { Route, Waypoint } from '../../domain/entities';
+import { InMemoryRouteRepository } from '../../infra/repositories';
 
 describe('EditRouteHttpRoute', () => {
   let server: FastifyInstance;

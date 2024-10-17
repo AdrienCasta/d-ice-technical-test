@@ -10,24 +10,43 @@ export default class AddRouteController {
     request: FastifyRequest<{ Body: AddRouteParams }>,
     reply: FastifyReply
   ) {
-    const { data: route, error } = validateAddRouteBody(request.body);
+    const { data, error } = validateAddRouteBody(request.body);
 
     if (error) {
       return reply.status(400).send({ message: error.message });
     }
 
     try {
-      await this.addRoute.execute(
-        Route.create(
-          route.name,
-          route.waypoints.map((waypoint) =>
-            Waypoint.create(waypoint.latitude, waypoint.longitude)
-          )
+      const route = Route.create(
+        data.name,
+        data.waypoints.map((waypoint) =>
+          Waypoint.create(waypoint.latitude, waypoint.longitude)
         )
       );
-      return reply.status(201).send();
+      await this.addRoute.execute(route);
+
+      return reply.status(201).send(route);
     } catch (error) {
       return reply.status(500).send({ message: (error as Error).message });
     }
   }
 }
+
+interface RouteDto {
+  id: string;
+  name: string;
+  waypoints: {
+    latitude: number;
+    longitude: number;
+  }[];
+}
+const routeToDto = (route: Route): RouteDto => {
+  return {
+    id: route.id,
+    name: route.name,
+    waypoints: route.waypoints.map((waypoint) => ({
+      latitude: waypoint.latitude,
+      longitude: waypoint.longitude,
+    })),
+  };
+};
