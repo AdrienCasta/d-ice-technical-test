@@ -7,19 +7,45 @@ import { Route } from "./types";
 import { initializeMap, updateMapRoute } from "./mapUtils";
 import RouteList from "./components/RouteList";
 import RouteDetails from "./components/RouteDetails";
-import { useRoutes } from "./hooks/useRoutes";
+import { useRoute } from "./hooks/useRoute";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX_ACCESS_TOKEN;
 
 export default function RoutePlanner() {
   const mapContainer = useRef(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const { routes, addRoute, updateRoute, deleteRoute, saveRoute, getRoutes } =
-    useRoutes();
+
+  const { getRoutes, createRoute, updateRoute, deleteRoute } = useRoute();
+
+  const { data: routes } = getRoutes;
+
+  const handleUpdateRoute = (updatedRoute: Route) => {
+    updateRoute.mutate(updatedRoute, {
+      onSuccess: () => {
+        setSelectedRoute(updatedRoute);
+      },
+    });
+  };
+
+  const handleDeleteRoute = (routeId: string) => {
+    deleteRoute.mutate(routeId, {
+      onSuccess: () => {
+        setSelectedRoute(null);
+      },
+    });
+  };
+
+  const handleCreateRoute = (newRoute: Omit<Route, "id">) => {
+    createRoute.mutate(newRoute, {
+      onSuccess: () => {
+        setSelectedRoute(newRoute);
+      },
+    });
+  };
+
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
 
   useEffect(() => {
-    getRoutes();
     if (!map.current) {
       map.current = initializeMap(mapContainer.current!);
     }
@@ -31,29 +57,6 @@ export default function RoutePlanner() {
     }
   }, [selectedRoute]);
 
-  const handleAddRoute = () => {
-    const newRoute = addRoute();
-    setSelectedRoute(newRoute);
-  };
-
-  const handleRouteAction = async (action: () => Promise<any>) => {
-    await action();
-    setSelectedRoute(null);
-    await getRoutes();
-  };
-
-  const handleDeleteRoute = () =>
-    handleRouteAction(() => {
-      if (!selectedRoute?.id) return Promise.resolve();
-      return deleteRoute(selectedRoute.id);
-    });
-
-  const handleUpdateRoute = (route: Route) =>
-    handleRouteAction(() => updateRoute(route));
-
-  const handleSaveRoute = (route: Route) =>
-    handleRouteAction(() => saveRoute(route));
-
   return (
     <div className="flex h-screen">
       <div ref={mapContainer} className="flex-grow" />
@@ -64,13 +67,27 @@ export default function RoutePlanner() {
             onBack={() => setSelectedRoute(null)}
             onUpdate={handleUpdateRoute}
             onDelete={handleDeleteRoute}
-            onSaveRoute={handleSaveRoute}
+            onSaveRoute={handleCreateRoute}
           />
         ) : (
           <RouteList
-            routes={routes}
+            routes={routes || []}
             onSelectRoute={setSelectedRoute}
-            onAddRoute={handleAddRoute}
+            onAddRoute={() => {
+              handleCreateRoute({
+                name: "Route" + routes?.length,
+                waypoints: [
+                  {
+                    latitude: 47.2184,
+                    longitude: -1.5536,
+                  },
+                  {
+                    latitude: 45.5017,
+                    longitude: -73.5673,
+                  },
+                ],
+              });
+            }}
           />
         )}
       </div>

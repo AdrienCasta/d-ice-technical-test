@@ -11,7 +11,7 @@ type RouteDetailsProps = {
   route: Route;
   onBack: () => void;
   onUpdate: (route: Route) => void;
-  onDelete: () => void;
+  onDelete: (routeId: string) => void;
   onSaveRoute: (route: RouteSchemaType) => void;
 };
 
@@ -27,7 +27,8 @@ export default function RouteDetails({
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty },
+    watch,
   } = useForm<RouteSchemaType>({
     defaultValues: route,
     resolver: zodResolver(RouteSchema),
@@ -50,16 +51,17 @@ export default function RouteDetails({
     }
   };
 
-  const onSubmit = (data: RouteSchemaType) => {
-    if (route.id) {
-      onUpdate(data);
-    } else {
-      onSaveRoute(data);
-    }
-  };
+  React.useEffect(() => {
+    const subscription = watch((value) => {
+      if (isValid) {
+        onUpdate(value as Route);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, isDirty, isValid, onUpdate]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form>
       <div className="flex items-center mb-4">
         <Button variant="ghost" size="icon" onClick={onBack} type="button">
           <ChevronLeft className="h-4 w-4" />
@@ -97,13 +99,12 @@ export default function RouteDetails({
                     render={({ field }) => (
                       <Input
                         {...field}
+                        max={90}
+                        min={-90}
                         onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          if (!isNaN(value) && value >= -90 && value <= 90) {
-                            field.onChange(value);
-                          }
+                          field.onChange(e.target.valueAsNumber);
                         }}
-                        type="text"
+                        type="number"
                         className="w-20 bg-slate-800 border-slate-700"
                       />
                     )}
@@ -116,12 +117,11 @@ export default function RouteDetails({
                     render={({ field }) => (
                       <Input
                         {...field}
-                        type="text"
+                        type="number"
+                        max={180}
+                        min={-180}
                         onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          if (!isNaN(value) && value >= -180 && value <= 180) {
-                            field.onChange(value);
-                          }
+                          field.onChange(e.target.valueAsNumber);
                         }}
                         className="w-20 bg-slate-800 border-slate-700"
                       />
@@ -163,13 +163,13 @@ export default function RouteDetails({
           </tr>
         </tbody>
       </table>
-      <Button className="w-full mt-4" onClick={onDelete} type="button">
+      <Button
+        className="w-full mt-4"
+        onClick={() => onDelete(route.id!)}
+        type="button"
+      >
         Delete Route
       </Button>
-      <Button className="w-full mt-4" type="submit" disabled={!isValid}>
-        {route.id ? "Update Route" : "Save Route"}
-      </Button>
-
       {errors.name && <p className="text-red-500">{errors.name.message}</p>}
       {errors.waypoints && (
         <p className="text-red-500">{errors.waypoints.message}</p>

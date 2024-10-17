@@ -23,10 +23,7 @@ export function updateMapRoute(map: mapboxgl.Map, route: Route) {
       properties: {},
       geometry: {
         type: "LineString",
-        coordinates: route.waypoints.map((wp) => [
-          parseFloat(wp.longitude),
-          parseFloat(wp.latitude),
-        ]),
+        coordinates: route.waypoints.map((wp) => [wp.longitude, wp.latitude]),
       },
     },
   });
@@ -45,6 +42,10 @@ export function updateMapRoute(map: mapboxgl.Map, route: Route) {
     },
   });
 
+  // Remove existing markers
+  const existingMarkers = document.querySelectorAll(".waypoint-marker");
+  existingMarkers.forEach((marker) => marker.remove());
+
   // Add markers for waypoints
   route.waypoints.forEach((waypoint, index) => {
     const el = document.createElement("div");
@@ -53,10 +54,7 @@ export function updateMapRoute(map: mapboxgl.Map, route: Route) {
       index === 0 ? "🚩" : index === route.waypoints.length - 1 ? "🏁" : "🔵";
 
     new mapboxgl.Marker(el)
-      .setLngLat([
-        parseFloat(waypoint.longitude),
-        parseFloat(waypoint.latitude),
-      ])
+      .setLngLat([waypoint.longitude, waypoint.latitude])
       .addTo(map);
   });
 }
