@@ -1,15 +1,44 @@
-# Project Name
+# REACT/JS Senior Software Engineer Project
 
-Brief description of your project goes here.
+## 🚀 Getting Started
 
-## Table of Contents
+### Prerequisites
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
+- Node.js (v20.18.0 or later)
+- npm (v10.8.2 or later)
 
-## Installation
+### Installation
 
-Describe how to install your project. For example:
+```bash
+npm install
+```
+
+## 🛠️ Running the Application
+
+### 1. Start the API Server
+
+In one terminal window, run:
+
+```bash
+npm run api:start
+```
+
+### 2. Start the Frontend
+
+In `packages/frontend`, create a `.env` file with the following content:
+
+```bash
+VITE_MAP_BOX_ACCESS_TOKEN=your-token-here
+```
+
+In another terminal window, run:
+
+```bash
+npm run frontend:start
+```
+
+### Test api
+
+```bash
+npm run api:test
+```

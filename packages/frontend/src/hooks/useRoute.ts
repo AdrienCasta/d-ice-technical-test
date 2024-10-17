@@ -17,7 +17,7 @@ export const useRoute = () => {
 
   const createRoute = useMutation<Route, Error, Omit<Route, "id">>({
     mutationFn: async (newRoute) => {
-      const { data } = await axios.post<Route>(API_URL, newRoute);
+      const { data } = await axios.post<{ value: Route }>(API_URL, newRoute);
       return data.value;
     },
     onSuccess: () => {
