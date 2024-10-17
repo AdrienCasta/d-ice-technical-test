@@ -59,7 +59,7 @@ export default function RoutePlanner() {
 
   useEffect(() => {
     updateMapRoute(selectedRoute);
-  }, [selectedRoute]);
+  }, [selectedRoute, updateMapRoute]);
 
   return (
     <div className="flex h-screen">
